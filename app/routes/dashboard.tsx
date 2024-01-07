@@ -1,5 +1,5 @@
 import type { Expense, Invoice } from '@prisma/client';
-import type { SerializeFrom } from '@remix-run/node';
+import type { LoaderFunctionArgs, SerializeFrom } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { Link as RemixLink, Outlet, useLoaderData, useLocation, useRouteError } from '@remix-run/react';
 
@@ -8,13 +8,17 @@ import { Form } from '~/components/forms';
 import { H1 } from '~/components/headings';
 import { NavLink } from '~/components/links';
 import { db } from '~/modules/db.server';
+import { requireUserId } from '~/modules/session/session.server';
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const userId = await requireUserId(request);
   const expenseQuery = db.expense.findFirst({
     orderBy: { createdAt: 'desc' },
+    where: { userId },
   });
   const invoiceQuery = db.invoice.findFirst({
     orderBy: { createdAt: 'desc' },
+    where: { userId },
   });
 
   const [firstExpense, firstInvoice] = await Promise.all([expenseQuery, invoiceQuery]);

@@ -5,7 +5,7 @@ import type { loader } from '~/root';
 
 type PublicUser = Omit<User, 'password'>;
 
-export function User(): PublicUser | null {
+export function useUser(): PublicUser | null {
   const data = useRouteLoaderData<typeof loader>('root');
   if (!data || !data.user) return null;
   const deserializedUser: PublicUser = {

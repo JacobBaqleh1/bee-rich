@@ -3,32 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const db = new PrismaClient();
-const income = [
-  {
-    title: 'Salary December',
-    amount: 2500,
-    currencyCode: 'USD',
-    date: '2022-12-30',
-  },
-  {
-    title: 'Salary November',
-    amount: 2500,
-    currencyCode: 'USD',
-    date: '2022-11-30',
-  },
-  {
-    title: 'Salary October',
-    amount: 2500,
-    currencyCode: 'USD',
-    date: '2022-10-30',
-  },
-  {
-    title: 'Salary September',
-    amount: 2500,
-    currencyCode: 'USD',
-    date: '2022-09-30',
-  },
-];
 
 const expenses = [
   {
