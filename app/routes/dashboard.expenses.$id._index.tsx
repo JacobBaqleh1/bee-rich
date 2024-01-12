@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { json, redirect } from '@remix-run/node';
+import { json, redirect, unstable_parseMultipartFormData } from '@remix-run/node';
 import {
   isRouteErrorResponse,
   useActionData,
@@ -10,9 +10,10 @@ import {
 } from '@remix-run/react';
 
 import { Button } from '~/components/buttons';
-import { Form, Input, Textarea } from '~/components/forms';
+import { Attachment, Form, Input, Textarea } from '~/components/forms';
 import { H2 } from '~/components/headings';
 import { FloatingActionLink } from '~/components/links';
+import { uploadHandler } from '~/modules/attachments.server';
 import { db } from '~/modules/db.server';
 import { requireUserId } from '~/modules/session/session.server';
 
@@ -75,7 +76,14 @@ export async function action({ params, request }: ActionFunctionArgs) {
   const { id } = params;
   if (!id) throw Error('id route parameter must be defined');
 
-  const formData = await request.formData();
+  let formData: FormData;
+
+  const contentType = request.headers.get('content-type');
+  if (contentType?.toLowerCase().includes('multipart/form')) {
+    formData = await unstable_parseMultipartFormData(request, uploadHandler);
+  } else {
+    formData = await request.formData();
+  }
   const intent = formData.get('intent');
   if (intent === 'delete') {
     return deleteExpense(request, id, userId);
@@ -106,7 +114,12 @@ export default function Component() {
         <p>${expense.amount}</p>
       </section>
       <FloatingActionLink to="/dashboard/expenses">Add expense</FloatingActionLink>
-      <Form method="POST" action={`/dashboard/expenses/${expense.id}`} key={expense.id}>
+      <Form
+        method="POST"
+        action={`/dashboard/expenses/${expense.id}?index`}
+        key={expense.id}
+        encType="multipart/form-data"
+      >
         <Input
           label="Title:"
           type="text"
@@ -117,6 +130,14 @@ export default function Component() {
         />
         <Textarea label="Description:" name="description" defaultValue={expense.description || ' '} />
         <Input label="Amount (in USD):" type="number" defaultValue={expense.amount} name="amount" required />
+        {expense.attachment ? (
+          <Attachment
+            label="Current Attachment"
+            attachmentUrl={`/dashboard/expenses/${expense.id}/attachments/${expense.attachment}`}
+          />
+        ) : (
+          <Input label="New Attacchment" type="file" name="attachment" />
+        )}
         <Button type="submit" name="intent" value="update" disabled={isSubmitting} isPrimary>
           {isSubmitting ? 'Saving...' : 'Save'}
         </Button>
