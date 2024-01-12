@@ -1,24 +1,31 @@
 import type { Expense, Invoice } from '@prisma/client';
-import type { LoaderFunctionArgs, SerializeFrom } from '@remix-run/node';
+import type { LoaderFunctionArgs, MetaFunction, SerializeFrom } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { Link as RemixLink, Outlet, useLoaderData, useLocation, useRouteError } from '@remix-run/react';
+import { Form, Link as RemixLink, Outlet, useLoaderData, useLocation, useRouteError } from '@remix-run/react';
 
 import { Container } from '~/components/containers';
-import { Form } from '~/components/forms';
 import { H1 } from '~/components/headings';
 import { NavLink } from '~/components/links';
 import { db } from '~/modules/db.server';
 import { requireUserId } from '~/modules/session/session.server';
+import type { loader as rootLoader } from '~/root';
+
+export const meta: MetaFunction<typeof loader, { root: typeof rootLoader }> = ({ matches }) => {
+  const root = matches.find((match) => match.id === 'root');
+  const userName = root?.data?.user?.name || null;
+  const title = userName ? `${userName}'s Dashboard | BeeRich` : 'Dashboard | BeeRich';
+  return [{ title }, { name: 'robots', content: 'noindex' }];
+};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
   const expenseQuery = db.expense.findFirst({
     orderBy: { createdAt: 'desc' },
-    where: { userId },
+    where: { userId: userId },
   });
   const invoiceQuery = db.invoice.findFirst({
     orderBy: { createdAt: 'desc' },
-    where: { userId },
+    where: { userId: userId },
   });
 
   const [firstExpense, firstInvoice] = await Promise.all([expenseQuery, invoiceQuery]);
@@ -44,7 +51,7 @@ function Layout({ firstExpense, firstInvoice, children }: LayoutProps) {
               </li>
               <li className="ml-auto">
                 <Form method="POST" action="/logout">
-                  <button type="submit">Log Out</button>
+                  <button type="submit">Log out</button>
                 </Form>
               </li>
             </ul>

@@ -11,7 +11,9 @@ export default function Component() {
         <nav className="p-4">
           <ul className="w-full flex flex-row gap-5 text-lg lg:text-2xl font-bold">
             <li>
-              <NavLink to="/">Home</NavLink>
+              <NavLink to="/" prefetch="intent">
+                Home
+              </NavLink>
             </li>
             {user ? (
               <li className="ml-auto">
@@ -23,12 +25,12 @@ export default function Component() {
               <>
                 <li className="ml-auto">
                   <NavLink to="/login" prefetch="intent">
-                    Log In
+                    Log in
                   </NavLink>
                 </li>
                 <li>
                   <NavLink to="/signup" prefetch="intent">
-                    Sign Up
+                    Sign up
                   </NavLink>
                 </li>
               </>

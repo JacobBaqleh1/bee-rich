@@ -8,12 +8,13 @@ import {
   useParams,
   useRouteError,
 } from '@remix-run/react';
-import { requireUserId } from '~/modules/session/session.server';
+
 import { Button } from '~/components/buttons';
 import { Form, Input, Textarea } from '~/components/forms';
 import { H2 } from '~/components/headings';
 import { FloatingActionLink } from '~/components/links';
 import { db } from '~/modules/db.server';
+import { requireUserId } from '~/modules/session/session.server';
 
 export function ErrorBoundary() {
   const error = useRouteError();

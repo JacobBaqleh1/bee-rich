@@ -60,7 +60,15 @@ export const meta: MetaFunction = () => {
   return [{ title: 'BeeRich' }];
 };
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: tailwindCSS }];
+export const links: LinksFunction = () => [
+  { rel: 'stylesheet', href: tailwindCSS },
+  { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+  {
+    href: 'https://fonts.googleapis.com/css2?family=Ubuntu&display=swap',
+    rel: 'stylesheet',
+  },
+];
 
 export default function Component() {
   return (
